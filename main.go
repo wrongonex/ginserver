@@ -2,17 +2,14 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
-	"net/http"
+	"github.com/wrongonex/ginserver/routes"
 )
 
 func main() {
 	router := gin.Default()
 
-	router.GET("/", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"Messsage": "WOooohhaaaaooo, this is gonna be a magical journey",
-		})
-	})
+	router.GET("/", routes.MainHandler)
+	router.GET("/random", routes.RandomMsg)
 
 	router.Run(":3000")
 
