@@ -1,0 +1,27 @@
+name: Connect to Docker via Tailscale
+
+on:
+  workflow_dispatch:
+
+jobs:
+  ssh-container:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install Tailscale
+        run: |
+          curl -fsSL https://tailscale.com/install.sh | sh
+          sudo tailscaled &
+          sleep 5
+          sudo tailscale up --authkey ${{ secrets.TAILSCALE_AUTHKEY }}
+
+      - name: Wait for Tailscale to be ready
+        run: sleep 10
+
+      - name: Test SSH into Docker container
+        run: |
+          ssh -o StrictHostKeyChecking=no root@100.125.140.68 -p 2222 << 'EOF'
+            echo "Connected to Docker container via Tailscale!"
+            date
+            touch /tmp/gh_actions_test_file.txt
+            ls -l /tmp
+          EOF
