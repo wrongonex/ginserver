@@ -22,40 +22,41 @@ jobs:
       - name: Wait for Tailscale
         run: sleep 10
 
-      # Step 3: SSH into Docker container and run commands
+      # Step 3: SSH into Docker container and deploy Go app
       - name: SSH into Docker container via SSH key
         run: |
           mkdir -p ~/.ssh
           printf "%s\n" "${{ secrets.GH_SSH_KEY }}" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
+
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_ed25519 root@100.125.140.68 -p 2222 << 'EOF'
             echo "Connected to Docker container via Tailscale!"
-            date
 
-            # Create hello.txt in /root
-            echo "IM all good baby" > ~/hello.txt
-            cat ~/hello.txt
+            # Kill previous Go app if running
+            if pgrep -f './app' > /dev/null; then
+              echo "Stopping previous app..."
+              pkill -f './app'
+            fi
 
-            # Pull latest code from GitHub
+            # Ensure project directory exists
             if [ ! -d ~/ginserver ]; then
               git clone https://github.com/wrongonex/ginserver.git ~/ginserver
-            else
-              cd ~/ginserver
-              git reset --hard
-              git pull
             fi
 
             cd ~/ginserver
+            git reset --hard
+            git pull
 
             # Download Go modules
             go mod download
 
-            # Build the Go app
+            # Build Go app
             go build -o app
 
-            # Run the app in background
+            # Start the app in background and log output
             nohup ./app > ~/app.log 2>&1 &
+            echo "App restarted successfully!"
 
-            # List files to verify
+            # Optional: List files to verify
             ls -l ~
           EOF
