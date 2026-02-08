@@ -1,7 +1,9 @@
 name: Connect to Docker via Tailscale
 
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - main
 
 jobs:
   ssh-container:
@@ -24,12 +26,32 @@ jobs:
       - name: SSH into Docker container via SSH key
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.GH_SSH_KEY }}" > ~/.ssh/id_ed25519
+          printf "%s\n" "${{ secrets.GH_SSH_KEY }}" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_ed25519 root@100.125.140.68 -p 2222 << 'EOF'
             echo "Connected to Docker container via Tailscale!"
             date
-            mkdir -p /tmp/gh_actions_test
-            touch /tmp/gh_actions_test/file_from_github.txt
-            ls -l /tmp/gh_actions_test
+
+            # Create hello.txt in /root
+            echo "IM all good baby" > ~/hello.txt
+            cat ~/hello.txt
+
+            # Clone your repo (if not already cloned)
+            if [ ! -d ~/ginserver ]; then
+              git clone https://github.com/wrongonex/ginserver.git ~/ginserver
+            fi
+
+            cd ~/ginserver
+
+            # Download Go modules
+            go mod download
+
+            # Build the Go app
+            go build -o app
+
+            # Run the app in background
+            nohup ./app &
+
+            # List files to verify
+            ls -l ~
           EOF
