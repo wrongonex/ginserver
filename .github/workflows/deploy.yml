@@ -36,15 +36,6 @@ jobs:
             echo "IM all good baby" > ~/hello.txt
             cat ~/hello.txt
 
-            # Ensure Go is installed (install if missing)
-            if ! command -v go &> /dev/null; then
-              echo "Go not found, installing..."
-              wget https://go.dev/dl/go1.22.11.linux-amd64.tar.gz
-              rm -rf /usr/local/go
-              tar -C /usr/local -xzf go1.22.11.linux-amd64.tar.gz
-              export PATH=$PATH:/usr/local/go/bin
-            fi
-
             # Pull latest code from GitHub
             if [ ! -d ~/ginserver ]; then
               git clone https://github.com/wrongonex/ginserver.git ~/ginserver
@@ -63,7 +54,7 @@ jobs:
             go build -o app
 
             # Run the app in background
-            nohup ./app &
+            nohup ./app > ~/app.log 2>&1 &
 
             # List files to verify
             ls -l ~
