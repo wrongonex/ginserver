@@ -36,9 +36,22 @@ jobs:
             echo "IM all good baby" > ~/hello.txt
             cat ~/hello.txt
 
-            # Clone your repo (if not already cloned)
+            # Ensure Go is installed (install if missing)
+            if ! command -v go &> /dev/null; then
+              echo "Go not found, installing..."
+              wget https://go.dev/dl/go1.22.11.linux-amd64.tar.gz
+              rm -rf /usr/local/go
+              tar -C /usr/local -xzf go1.22.11.linux-amd64.tar.gz
+              export PATH=$PATH:/usr/local/go/bin
+            fi
+
+            # Pull latest code from GitHub
             if [ ! -d ~/ginserver ]; then
               git clone https://github.com/wrongonex/ginserver.git ~/ginserver
+            else
+              cd ~/ginserver
+              git reset --hard
+              git pull
             fi
 
             cd ~/ginserver
