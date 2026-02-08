@@ -8,7 +8,7 @@ import (
 
 func MainHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
-		"Messsage": "I have no limitations",
+		"Messsage": "This is not overkill, this is gin server",
 	})
 }
 
