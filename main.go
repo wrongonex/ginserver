@@ -10,6 +10,7 @@ func main() {
 
 	router.GET("/", routes.MainHandler)
 	router.GET("/random", routes.RandomMsg)
+	router.GET("/test", routes.TestRoute)
 
 	router.Run(":3000")
 

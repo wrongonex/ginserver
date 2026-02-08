@@ -17,3 +17,10 @@ func RandomMsg(c *gin.Context) {
 		"Messsage": "Random Message",
 	})
 }
+
+func TestRoute(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{
+		"success":"true",
+		"Hello":"gta 6 is coming soon...",
+	})
+}
