@@ -10,7 +10,7 @@ func main() {
 
 	router.GET("/", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
-			"Messsage": "I'm running all fine on port 3000",
+			"Messsage": "Are you still doubtful about the power of Go?, babes that's cold",
 		})
 	})
 
