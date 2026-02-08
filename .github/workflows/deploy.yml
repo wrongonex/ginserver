@@ -6,7 +6,9 @@ on:
 jobs:
   ssh-container:
     runs-on: ubuntu-latest
+
     steps:
+      # Step 1: Install Tailscale
       - name: Install Tailscale
         run: |
           curl -fsSL https://tailscale.com/install.sh | sh
@@ -14,14 +16,20 @@ jobs:
           sleep 5
           sudo tailscale up --authkey ${{ secrets.TAILSCALE_AUTHKEY }}
 
-      - name: Wait for Tailscale to be ready
+      # Step 2: Wait for Tailscale to be ready
+      - name: Wait for Tailscale
         run: sleep 10
 
-      - name: Test SSH into Docker container
+      # Step 3: SSH into Docker container and run commands
+      - name: SSH into Docker container via SSH key
         run: |
-          ssh -o StrictHostKeyChecking=no root@100.125.140.68 -p 2222 << 'EOF'
+          mkdir -p ~/.ssh
+          echo "${{ secrets.GH_SSH_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_ed25519 root@100.125.140.68 -p 2222 << 'EOF'
             echo "Connected to Docker container via Tailscale!"
             date
-            touch /tmp/gh_actions_test_file.txt
-            ls -l /tmp
+            mkdir -p /tmp/gh_actions_test
+            touch /tmp/gh_actions_test/file_from_github.txt
+            ls -l /tmp/gh_actions_test
           EOF
